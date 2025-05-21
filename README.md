@@ -1,7 +1,7 @@
 # ProjectM5stack (written using chatgpt)
 Final project for the Cloud and Advanced Analytics course, designed to integrate all the acquired knowledge and utilize a connected IoT device as a weather station.
 
-First I have imagined some designed like in Interaction Design. I wanted to add animation, however it renders not very well on the M5stack (you can test them).
+First I have imagined some designed like in Interaction Design. I wanted to add a circle animation, however it renders not very well on the M5stack (you can test them on the pygame folder). I choose an other option with no animation but interactive buttons.
 There is a video of the M5stack UI, which consist of three buttons that rotate clockwise the humidity or indoor/outdoor temperature. 
 It allows user to little bit customize their frontend, and the button are large enough to be click. I found not easy to use the small buttons from the menu page of the application.
 
