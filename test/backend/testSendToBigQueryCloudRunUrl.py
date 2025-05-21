@@ -19,7 +19,7 @@ def test_send_to_bigquery_success():
         }
     }
 
-    url = "http://localhost:8080/send-to-bigquery"
+    url = "https://docker-flask-backend-project-688745668065.europe-west6.run.app/send-to-bigquery"
     response = requests.post(url, json=data)
 
     assert response.status_code == 200, f"Error {response.status_code}: {response.text}"
