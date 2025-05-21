@@ -1,5 +1,9 @@
 ## 📁 Project Structure
 
+I have imagine a structure and based myself from last assignment 2. I ask chatgpt to refine and give me this following trees.
+I have added the secrets.env which seems better and the api folder on the backend. I also have added a test function.
+
+
 ```plaintext
 ProjectM5stack/
 │
