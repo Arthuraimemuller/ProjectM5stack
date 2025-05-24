@@ -1,6 +1,5 @@
 from app import create_app
-from config import load_config
-load_config()
+
 
 app = create_app()
 

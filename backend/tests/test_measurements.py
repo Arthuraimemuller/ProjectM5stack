@@ -1,10 +1,9 @@
 import unittest
 from app import create_app
-from config import load_config
 
 class MeasurementsApiTestCase(unittest.TestCase):
     def setUp(self):
-        load_config()  # Assure que les .env sont chargés
+        # Plus besoin d'appeler load_config(), les variables sont déjà chargées via settings
         self.app = create_app()
         self.client = self.app.test_client()
         self.app.testing = True

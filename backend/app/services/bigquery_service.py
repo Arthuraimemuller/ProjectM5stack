@@ -1,7 +1,7 @@
 from google.cloud import bigquery
-import os
 from datetime import datetime
 from typing import Optional
+from config import settings  # Import depuis ton module de config
 
 
 class BigQueryService:
@@ -10,9 +10,9 @@ class BigQueryService:
     """
 
     def __init__(self):
-        self.project_id = os.getenv("GCP_PROJECT_ID")
-        self.dataset_id = os.getenv("BQ_DATASET_ID")
-        self.table_id = os.getenv("BQ_TABLE_ID")
+        self.project_id = settings.GCP_PROJECT_ID
+        self.dataset_id = settings.BQ_DATASET_ID
+        self.table_id = settings.BQ_TABLE_ID
 
         if not all([self.project_id, self.dataset_id, self.table_id]):
             raise ValueError("Missing one or more BigQuery environment variables.")

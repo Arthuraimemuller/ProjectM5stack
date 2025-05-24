@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, current_app, request
-from ..services.bigquery_service import BigQueryService
+from app.services.bigquery_service import BigQueryService
 from typing import Optional
 import traceback
 

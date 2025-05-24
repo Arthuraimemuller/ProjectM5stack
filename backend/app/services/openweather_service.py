@@ -1,5 +1,5 @@
 import requests
-import os
+from config import settings  # Importe la config centralisée
 
 class OpenWeatherService:
     """
@@ -9,15 +9,16 @@ class OpenWeatherService:
     BASE_URL_CURRENT = "https://api.openweathermap.org/data/2.5/weather"
     BASE_URL_FORECAST = "https://api.openweathermap.org/data/2.5/forecast"
 
-    def __init__(self, api_key: str, city: str, country_code: str):
+    def __init__(self, api_key=None, city=None, country_code=None):
         """
-        :param api_key: OpenWeather API key
-        :param city: City name (e.g., "Geneva")
-        :param country_code: Country code (e.g., "CH")
+        If parameters are not given, use global settings.
         """
-        self.api_key = api_key
-        self.city = city
-        self.country_code = country_code
+        self.api_key = api_key or settings.OPENWEATHER_API_KEY
+        self.city = city or getattr(settings, "OPENWEATHER_CITY", "Geneva")
+        self.country_code = country_code or getattr(settings, "OPENWEATHER_COUNTRY", "CH")
+
+        if not self.api_key:
+            raise ValueError("OpenWeather API key must be provided in settings or as argument.")
 
     def get_current_weather(self):
         """

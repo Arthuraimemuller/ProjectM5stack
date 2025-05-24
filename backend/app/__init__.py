@@ -27,25 +27,39 @@
 #     return app
 
 
-import os
+# import os
+# from flask import Flask
+# #from config import load_config
+# from dotenv import load_dotenv
+#
+# # 🔁 Charge les variables d'environnement dès le début
+# #load_config()  # charge config/secrets.env via dotenv
+#
+# # ❌ Plus besoin de recharger dotenv manuellement ici :
+# # load_dotenv(os.path.join(os.path.dirname(__file__), "config/secrets.env"))
+#
+# # ✅ Import du nouveau blueprint unifié
+# from app.routes.measurements import measurements_api, init_measurements_routes
+# init_measurements_routes()  # Initialise le BigQueryService
+#
+# def create_app():
+#     app = Flask(__name__)
+#
+#     # ✅ Enregistrement du seul blueprint nécessaire
+#     app.register_blueprint(measurements_api)
+#
+#     return app
+
+
 from flask import Flask
-from config import load_config
-from dotenv import load_dotenv
-
-# 🔁 Charge les variables d'environnement dès le début
-load_config()  # charge config/secrets.env via dotenv
-
-# ❌ Plus besoin de recharger dotenv manuellement ici :
-# load_dotenv(os.path.join(os.path.dirname(__file__), "config/secrets.env"))
-
-# ✅ Import du nouveau blueprint unifié
-from app.api.measurements import measurements_api, init_measurements_routes
-init_measurements_routes()  # Initialise le BigQueryService
+from app.routes.weather import weather_api
+from app.routes.forecast import forecast_api
 
 def create_app():
     app = Flask(__name__)
 
-    # ✅ Enregistrement du seul blueprint nécessaire
-    app.register_blueprint(measurements_api)
+    # Enregistre les routes
+    app.register_blueprint(weather_api)
+    app.register_blueprint(forecast_api)
 
     return app
