@@ -6,7 +6,7 @@ from typing import Optional
 
 class BigQueryService:
     """
-    Service to interact with Google BigQuery for inserting sensor data.
+    Service to interact with Google BigQuery for inserting sensor and weather data.
     """
 
     def __init__(self):
@@ -21,52 +21,54 @@ class BigQueryService:
         self.full_table_id = f"{self.project_id}.{self.dataset_id}.{self.table_id}"
 
     def insert_sensor_data(
-            self,
-            indoor_temp: float,
-            indoor_humidity: float,
-            air_quality: Optional[float] = None,
-            co2: Optional[int] = None,
-            tvoc: Optional[int] = None,
-            timestamp: Optional[str] = None
+        self,
+        device_id: str,
+        timestamp: Optional[str] = None,
+        indoor_temp: Optional[float] = None,
+        indoor_humidity: Optional[float] = None,
+        indoor_co2: Optional[int] = None,
+        indoor_tvoc: Optional[int] = None,
+        motion_detected: Optional[bool] = None,
+        outdoor_temp: Optional[float] = None,
+        outdoor_humidity: Optional[float] = None,
+        outdoor_pressure: Optional[float] = None,
+        outdoor_wind_speed: Optional[float] = None,
+        outdoor_weather: Optional[str] = None,
+        source: Optional[str] = "M5Stack+OpenWeather"
     ) -> bool:
         """
-        Insert a row of indoor sensor data into BigQuery.
-
-        :param indoor_temp: Temperature in °C
-        :param indoor_humidity: Humidity in %
-        :param air_quality: Optional air quality index
-        :param co2: Optional CO2 level in ppm
-        :param tvoc: Optional TVOC value
-        :param timestamp: Optional ISO timestamp (if None, use now)
-        :return: True if successful, else raise
+        Insert a full indoor/outdoor data row into BigQuery.
         """
         if not timestamp:
             timestamp = datetime.utcnow().isoformat()
 
         row = {
             "timestamp": timestamp,
+            "device_id": device_id,
             "indoor_temp": indoor_temp,
             "indoor_humidity": indoor_humidity,
+            "indoor_co2": indoor_co2,
+            "indoor_tvoc": indoor_tvoc,
+            "motion_detected": motion_detected,
+            "outdoor_temp": outdoor_temp,
+            "outdoor_humidity": outdoor_humidity,
+            "outdoor_pressure": outdoor_pressure,
+            "outdoor_wind_speed": outdoor_wind_speed,
+            "outdoor_weather": outdoor_weather,
+            "source": source
         }
 
-        # Add optional values if provided
-        if air_quality is not None:
-            row["air_quality"] = air_quality
-        if co2 is not None:
-            row["co2"] = co2
-        if tvoc is not None:
-            row["tvoc"] = tvoc
+        # Supprimer les clés avec valeur None (facultatif, pour éviter les NULL explicites)
+        clean_row = {k: v for k, v in row.items() if v is not None}
 
-        errors = self.client.insert_rows_json(self.full_table_id, [row])
+        errors = self.client.insert_rows_json(self.full_table_id, [clean_row])
         if errors:
             raise RuntimeError(f"Failed to insert rows: {errors}")
         return True
 
-    def get_latest_indoor_data(self) -> dict:
+    def get_latest_measurement(self) -> dict:
         """
-        Retrieves the most recent indoor measurement from BigQuery.
-
-        :return: dict with keys like temperature, humidity, etc.
+        Retrieves the most recent full measurement (indoor + outdoor).
         """
         query = f"""
             SELECT *
@@ -77,31 +79,19 @@ class BigQueryService:
 
         try:
             query_job = self.client.query(query)
-            result = query_job.result()
-            row = next(iter(result), None)
+            row = next(iter(query_job.result()), None)
 
             if row:
-                return {
-                    "timestamp": row.get("timestamp"),
-                    "indoor_temp": row.get("indoor_temp"),
-                    "indoor_humidity": row.get("indoor_humidity"),
-                    "air_quality": row.get("air_quality", None),
-                    "co2": row.get("co2", None),
-                    "tvoc": row.get("tvoc", None),
-                }
-
-            return {"error": "No data found in BigQuery."}
+                return dict(row)
+            else:
+                return {"error": "No data found in BigQuery."}
 
         except Exception as e:
-            raise RuntimeError(f"Failed to fetch indoor data: {e}")
+            raise RuntimeError(f"Failed to fetch latest data: {e}")
 
-
-    def get_last_n_indoor_measurements(self, limit: int = 10) -> list:
+    def get_last_n_measurements(self, limit: int = 10) -> list:
         """
-        Retrieve the last N indoor measurements from BigQuery.
-
-        :param limit: Number of rows to retrieve
-        :return: List of dicts
+        Retrieve the last N measurements from BigQuery.
         """
         query = f"""
             SELECT *
@@ -112,20 +102,7 @@ class BigQueryService:
 
         try:
             query_job = self.client.query(query)
-            results = query_job.result()
-
-            rows = []
-            for row in results:
-                rows.append({
-                    "timestamp": row.get("timestamp"),
-                    "indoor_temp": row.get("indoor_temp"),
-                    "indoor_humidity": row.get("indoor_humidity"),
-                    "air_quality": row.get("air_quality", None),
-                    "co2": row.get("co2", None),
-                    "tvoc": row.get("tvoc", None),
-                })
-
-            return rows
+            return [dict(row) for row in query_job.result()]
 
         except Exception as e:
-            raise RuntimeError(f"Failed to fetch history from BigQuery: {e}")
+            raise RuntimeError(f"Failed to fetch last {limit} rows: {e}")
