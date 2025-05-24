@@ -2,7 +2,7 @@ import os
 
 # Dossiers à inclure (ajuste à ton besoin)
 folders_to_include = ["backend", "frontend", "UIM5Stack"]
-max_depth = 2  # Profondeur maximale
+max_depth = 6  # Profondeur maximale
 
 def print_tree(start_path, prefix='', max_depth=4, current_depth=0):
     if current_depth > max_depth:

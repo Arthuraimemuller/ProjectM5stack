@@ -1,14 +1,12 @@
 from flask import Flask, request, jsonify
 import os
-import hashlib
-from api.bigquery_service import BigQueryService
-from api.openweather_service import OpenWeatherService
+from backend.app.services.bigquery_service import BigQueryService
+from backend.app.services.openweather_service import OpenWeatherService
 from dotenv import load_dotenv
-import datetime
 import socket
 
 app = Flask(__name__)
-load_dotenv("config/secrets.env")
+load_dotenv("backend/config/secrets.env")
 
 
 EXPECTED_PASSWD_HASH = os.getenv("EXPECTED_PASSWD_HASH")
